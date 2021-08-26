@@ -17,4 +17,4 @@ jobs:
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: bash get-kolla-images.sh
+        run: sudo bash get-kolla-images.sh
