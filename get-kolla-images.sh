@@ -9,13 +9,12 @@ pip install kolla-ansible docker
 LATEST_RELEASE=$(curl -sSkL http://www.openstack.com |  grep -oP 'LATEST RELEASE: \K(.*)(?=<)')
 LATEST_RELEASE=${LATEST_RELEASE,,}
 
-mkdir /etc/kolla
+cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc
 cat << EOF > /etc/kolla/globals.yml
 kolla_base_distro: "ubuntu"
 kolla_install_type: "binary"
 openstack_release: "${LATEST_RELEASE}"
 network_interface: "eth0"
-kolla_internal_vip_address: "10.0.2.10"
 neutron_plugin_agent: "openvswitch"
 neutron_ipam_driver: "internal"
 keystone_admin_user: "admin"
