@@ -24,6 +24,10 @@ glance_enable_rolling_upgrade: "no"
 nova_compute_virt_type: "kvm"
 EOF
 
+kolla-ansible pull
+
+sleep 1
+
 docker save $(docker image list "kolla/ubuntu-binary-*" -q) | xz > /tmp/kolla-ubuntu-binary-images-${LATEST_RELEASE}.tar.xz
 
 echo kolla-ubuntu-binary-images-${LATEST_RELEASE} is:
