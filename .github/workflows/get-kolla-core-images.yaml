@@ -1,4 +1,4 @@
-name: get openstack kolla images
+name: get openstack kolla core images
 
 on:
   schedule:
@@ -13,8 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: get kolla images
+      - name: get kolla core images
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: sudo -E bash get-kolla-images.sh
+        run: sudo -E bash get-kolla-core-images.sh

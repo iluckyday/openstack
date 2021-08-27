@@ -17,4 +17,4 @@ jobs:
         env:
           WXPUSHER_APPTOKEN: ${{ secrets.WXPUSHER_APPTOKEN }}
           WXPUSHER_UID: ${{ secrets.WXPUSHER_UID }}
-        run: sudo bash build-kolla-images.sh
+        run: sudo -E bash build-kolla-images.sh
