@@ -1,18 +1,16 @@
 #!/bin/bash
 set -ex
 
-pip install kolla docker
+pip install kolla
 
 LATEST_RELEASE=$(curl -sSkL http://www.openstack.com |  grep -oP 'LATEST RELEASE: \K(.*)(?=<)')
 LATEST_RELEASE=${LATEST_RELEASE,,}
 
-cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc
-cat etc_kolla_globals.yml | sed "s/LATEST_RELEASE/${LATEST_RELEASE}/" | tee /etc/kolla/globals.yml
-
-kolla-build -b ubuntu -t binary
+kolla-build -b ubuntu -t binary --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd ^neutron ^nova octavia openvswitch placement prometheus qdrouterd qdrouterd redis sahara senlin swift tacker tgtd vitrage zookeeper
 
 sleep 1
 
+docker image list "kolla/ubuntu-binary-*"
 docker save $(docker image list "kolla/ubuntu-binary-*" -q) | xz > /tmp/kolla-ubuntu-binary-images-${LATEST_RELEASE}.tar.xz
 
 echo kolla-ubuntu-binary-images-${LATEST_RELEASE} is:
