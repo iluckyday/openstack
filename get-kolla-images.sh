@@ -10,18 +10,7 @@ LATEST_RELEASE=$(curl -sSkL http://www.openstack.com |  grep -oP 'LATEST RELEASE
 LATEST_RELEASE=${LATEST_RELEASE,,}
 
 cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc
-cat << EOF > /etc/kolla/globals.yml
-kolla_base_distro: "ubuntu"
-kolla_install_type: "binary"
-openstack_release: "${LATEST_RELEASE}"
-network_interface: "eth0"
-neutron_plugin_agent: "openvswitch"
-neutron_ipam_driver: "internal"
-keystone_admin_user: "admin"
-keystone_admin_project: "admin"
-glance_enable_rolling_upgrade: "no"
-nova_compute_virt_type: "kvm"
-EOF
+cp -f globals.yml /etc/kolla/globals.yml
 
 kolla-ansible pull
 
@@ -31,8 +20,6 @@ docker save $(docker image list "kolla/ubuntu-binary-*" -q) | xz > /tmp/kolla-ub
 
 echo kolla-ubuntu-binary-images-${LATEST_RELEASE} is:
 ls -lh /tmp/kolla-ubuntu-binary-images-${LATEST_RELEASE}.tar.xz
-
-exit
 
 for f in /tmp/kolla-*xz; do
 FILENAME=$(basename $f)
