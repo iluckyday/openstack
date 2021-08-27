@@ -9,10 +9,12 @@ LATEST_RELEASE=${LATEST_RELEASE,,}
 DISTRO=ubuntu
 TYPE=binary
 
-kolla-build -b ${DISTRO} -t ${TYPE} --tag ${LATEST_RELEASE} --use-dumb-init --summary --nokeep --openstack-branch ${LATEST_RELEASE} --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd ^neutron ^nova octavia openvswitch placement prometheus qdrouterd qdrouterd redis sahara senlin swift tacker tgtd vitrage zookeeper
+kolla-build -b ${DISTRO} -t ${TYPE} --tag ${LATEST_RELEASE} --use-dumb-init --summary --nokeep --openstack-branch ${LATEST_RELEASE} --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd ^neutron ^nova octavia openvswitch placement prometheus qdrouterd qdrouterd redis sahara senlin swift ^tacker tgtd vitrage zookeeper
 
 sleep 1
 
+docker image list "kolla/${DISTRO}-${TYPE}-*"
+docker image rm $(docker image list "kolla/${DISTRO}-${TYPE}-*base" -q)
 docker image list "kolla/${DISTRO}-${TYPE}-*"
 docker save $(docker image list "kolla/${DISTRO}-${TYPE}-*" -q) | xz > /tmp/kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}.tar.xz
 
