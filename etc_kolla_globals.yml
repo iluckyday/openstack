@@ -1,6 +1,6 @@
 kolla_base_distro: "ubuntu"
 kolla_install_type: "binary"
-openstack_release: "${LATEST_RELEASE}"
+openstack_release: "LATEST_RELEASE"
 network_interface: "eth0"
 neutron_plugin_agent: "openvswitch"
 neutron_ipam_driver: "internal"

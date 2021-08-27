@@ -10,7 +10,7 @@ LATEST_RELEASE=$(curl -sSkL http://www.openstack.com |  grep -oP 'LATEST RELEASE
 LATEST_RELEASE=${LATEST_RELEASE,,}
 
 cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc
-cp -f globals.yml /etc/kolla/globals.yml
+cat etc_kolla_globals.yml | sed "s/LATEST_RELEASE/${LATEST_RELEASE}/" | tee /etc/kolla/globals.yml
 
 kolla-ansible pull
 
