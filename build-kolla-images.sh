@@ -7,19 +7,20 @@ LATEST_RELEASE=$(curl -sSkL http://www.openstack.com |  grep -oP 'LATEST RELEASE
 LATEST_RELEASE=${LATEST_RELEASE,,}
 
 DISTRO=ubuntu
-TYPE=binary
+TYPE=source
 
-kolla-build -b ${DISTRO} -t ${TYPE} --tag ${LATEST_RELEASE} --use-dumb-init --summary --nokeep --openstack-branch ${LATEST_RELEASE} --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd ^neutron ^nova octavia openvswitch placement prometheus qdrouterd qdrouterd redis sahara senlin swift ^tacker tgtd vitrage zookeeper
+kolla-build -b ${DISTRO} -t ${TYPE} --tag ${LATEST_RELEASE} --use-dumb-init --summary --nokeep --openstack-branch ${LATEST_RELEASE} --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd neutron nova octavia openvswitch placement prometheus qdrouterd redis sahara senlin swift tacker tgtd vitrage zookeeper
 
 sleep 1
 
+#docker image list "kolla/${DISTRO}-${TYPE}-*"
+#docker image rm $(docker image list "kolla/${DISTRO}-${TYPE}-*base" -q)
 docker image list "kolla/${DISTRO}-${TYPE}-*"
-docker image rm $(docker image list "kolla/${DISTRO}-${TYPE}-*base" -q)
-docker image list "kolla/${DISTRO}-${TYPE}-*"
-docker save $(docker image list "kolla/${DISTRO}-${TYPE}-*" -q) | xz > /tmp/kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}.tar.xz
+DDATE=$(date +%Y%m%d%H%M%S)
+docker save $(docker image list "kolla/${DISTRO}-${TYPE}-*" -q) | xz > /tmp/kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 
 echo kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE} is:
-ls -lh /tmp/kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}.tar.xz
+ls -lh /tmp/kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 
 for (( n=1; n<=3; n++)); do
   ver="$(curl -skL https://api.github.com/repos/Mikubill/transfer/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
