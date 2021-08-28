@@ -13,7 +13,7 @@ LATEST_RELEASE=${LATEST_RELEASE,,}
 DISTRO=ubuntu
 TYPE=source
 
-kolla-build --skip-parents --skip-existing --summary --nokeep -b ${DISTRO} -t ${TYPE} --tag ${LATEST_RELEASE} --openstack-branch ${LATEST_RELEASE} --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd neutron nova octavia openvswitch placement prometheus redis sahara senlin swift tacker tgtd vitrage zookeeper
+kolla-build --debug --skip-parents --skip-existing --summary --nokeep -b ${DISTRO} -t ${TYPE} --tag ${LATEST_RELEASE} --openstack-branch ${LATEST_RELEASE} --openstack-release ${LATEST_RELEASE} barbican cinder designate glance haproxy heat horizon ironic iscsid keepalived keystone kolla-toolbox manila mariadb masakari memcached mistral multipathd neutron nova octavia openvswitch placement prometheus redis sahara senlin swift tacker tgtd vitrage zookeeper
 
 sleep 1
 
