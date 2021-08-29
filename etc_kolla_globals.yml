@@ -1,5 +1,5 @@
-kolla_base_distro: "ubuntu"
-kolla_install_type: "source"
+kolla_base_distro: "DISTRO"
+kolla_install_type: "TYPE"
 openstack_release: "LATEST_RELEASE"
 network_interface: "eth0"
 neutron_plugin_agent: "openvswitch"
