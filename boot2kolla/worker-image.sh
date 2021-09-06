@@ -183,7 +183,7 @@ e2scrub_reap.service \
 logrotate.service
 
 apt update
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 apparmor python3-docker
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 apparmor python3-docker iptables
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
