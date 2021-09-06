@@ -4,7 +4,6 @@ set -ex
 timedatectl set-timezone "Asia/Shanghai"
 
 release=$(curl -sSkL https://www.debian.org/releases/ | grep -oP 'codenamed <em>\K(.*)(?=</em>)')
-release="sid"
 include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils,isc-dhcp-client"
 
 export DEBIAN_FRONTEND=noninteractive
