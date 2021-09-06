@@ -166,6 +166,8 @@ cat << EOF > ${MNTDIR}/etc/hosts
 127.0.0.1 localhost
 EOF
 
+clients=$(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a}{a=$0}')
+
 chroot ${MNTDIR} /bin/bash -c "
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin PYTHONDONTWRITEBYTECODE=1 DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' /etc/shadow
@@ -186,7 +188,7 @@ systemd-timesyncd.service
 
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 ansible python3-pip
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 "$(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a}{a=$0}')" || true
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 $clients || true
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org kolla-ansible
