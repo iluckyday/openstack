@@ -5,7 +5,7 @@ timedatectl set-timezone "Asia/Shanghai"
 
 release=$(curl -sSkL https://www.debian.org/releases/ | grep -oP 'codenamed <em>\K(.*)(?=</em>)')
 release="sid"
-include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils"
+include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils,isc-dhcp-client"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -144,10 +144,7 @@ chmod +x ${MNTDIR}/usr/sbin/stack-init.sh
 sed -i '/src/d' ${MNTDIR}/etc/apt/sources.list
 ( umask 226 && echo 'Defaults env_keep+="PYTHONDONTWRITEBYTECODE PYTHONHISTFILE"' > ${MNTDIR}/etc/sudoers.d/env_keep )
 
-for i in stack-install.service stack-init.service
-do
-	ln -sf /etc/systemd/system/$i ${MNTDIR}/etc/systemd/system/multi-user.target.wants/$i
-done
+ln -sf /etc/systemd/system/stack-init.service ${MNTDIR}/etc/systemd/system/multi-user.target.wants/stack-init.service
 
 mkdir -p ${MNTDIR}/boot/syslinux
 cat << EOF > ${MNTDIR}/boot/syslinux/syslinux.cfg
