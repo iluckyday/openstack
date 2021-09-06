@@ -134,7 +134,7 @@ dhcp_nic=$(basename /sys/class/net/en*10)
 
 for (( n=1; n<=5; n++)); do
 	dhclient -1 -4 -q $dhcp_nic || continue
-	wget -qO /tmp/run.sh http://boot2kolla/run.sh && break || exit 1
+	busybox wget -qO /tmp/run.sh http://boot2kolla/run.sh && break || exit 1
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1

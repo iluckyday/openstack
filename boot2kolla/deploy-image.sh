@@ -134,7 +134,7 @@ dhcp_nic=$(basename /sys/class/net/en*10)
 
 for (( n=1; n<=5; n++)); do
 	dhclient -1 -4 -q $dhcp_nic || continue
-	wget -qO /tmp/run.sh http://boot2kolla/run.sh && break || exit 1
+	busybox wget -qO /tmp/run.sh http://boot2kolla/run.sh && break || exit 1
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
@@ -186,7 +186,7 @@ systemd-timesyncd.service
 
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 ansible python3-pip
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 $(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a}{a=$0}') || true
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 "$(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a}{a=$0}')" || true
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org kolla-ansible
@@ -221,8 +221,6 @@ sleep 1
 umount ${MNTDIR}
 sleep 1
 losetup -d $loopx
-
-#qemu-system-x86_64 -machine q35,accel=kvm:xen:hax:hvf:whpx:tcg -smp "$(nproc)" -m 4G -nographic -object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0 -boot c -drive file=/tmp/debian.raw,if=virtio,format=raw,media=disk -netdev user,id=n0,ipv6=off -device virtio-net,netdev=n0
 
 sleep 2
 
