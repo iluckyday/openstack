@@ -6,7 +6,6 @@ timedatectl set-timezone "Asia/Shanghai"
 release=$(curl -sSkL https://www.debian.org/releases/ | grep -oP 'codenamed <em>\K(.*)(?=</em>)')
 release="sid"
 include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils"
-include_apps+=",python3-pip,ansible"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -188,11 +187,13 @@ e2scrub_reap.service \
 logrotate.service \
 systemd-timesyncd.service
 
-pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org kolla-ansible
-
 apt update
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 ansible python3-pip
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 $(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a}{a=$0}') || true
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
+
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org kolla-ansible
+
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
 
