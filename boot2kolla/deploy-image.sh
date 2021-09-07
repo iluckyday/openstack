@@ -4,7 +4,7 @@ set -ex
 timedatectl set-timezone "Asia/Shanghai"
 
 release=$(curl -sSkL https://www.debian.org/releases/ | grep -oP 'codenamed <em>\K(.*)(?=</em>)')
-include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils,isc-dhcp-client"
+include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -128,12 +128,14 @@ cat << "EOF" > ${MNTDIR}/usr/sbin/stack-init.sh
 #!/bin/bash
 set -ex
 
-dhcp_nic=$(basename /sys/class/net/en*10)
-[ "$dhcp_nic" = "en*10" ] && exit 1
+UUID=$(cat /sys/class/dmi/id/product_uuid)
 
-for (( n=1; n<=5; n++)); do
-	dhclient -1 -4 -q $dhcp_nic || continue
-	busybox wget -qO /tmp/run.sh http://boot2kolla/run.sh && break || exit 1
+ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
+for ifname in ifnames
+do
+	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256)) dev $ifname
+	busybox ip link set dev $ifname up
+	busybox wget -T 2 --header="X-Host-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && ip addr flush dev $ifname && break || exit 1
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1

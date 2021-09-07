@@ -128,12 +128,14 @@ cat << "EOF" > ${MNTDIR}/usr/sbin/stack-init.sh
 #!/bin/bash
 set -ex
 
-dhcp_nic=$(basename /sys/class/net/en*10)
-[ "$dhcp_nic" = "en*10" ] && exit 1
+UUID=$(cat /sys/class/dmi/id/product_uuid)
 
-for (( n=1; n<=5; n++)); do
-	dhclient -1 -4 -q $dhcp_nic || continue
-	busybox wget -qO /tmp/run.sh http://boot2kolla/run.sh && break || exit 1
+ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
+for ifname in ifnames
+do
+	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256)) dev $ifname
+	busybox ip link set dev $ifname up
+	busybox wget -T 2 --header="X-Host-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && ip addr flush dev $ifname && break || exit 1
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
@@ -182,7 +184,7 @@ e2scrub_reap.service \
 logrotate.service
 
 apt update
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 apparmor python3-docker iptables
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 dbus apparmor python3-docker iptables
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
