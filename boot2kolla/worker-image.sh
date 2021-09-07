@@ -133,7 +133,7 @@ UUID=$(cat /sys/class/dmi/id/product_uuid)
 ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
 for ifname in $ifnames
 do
-	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256)) dev $ifname
+	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
 	busybox ip link set dev $ifname up
 	busybox wget -T 2 --header="X-Host-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && ip addr flush dev $ifname && break || exit 1
 done
