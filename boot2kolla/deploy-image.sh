@@ -135,7 +135,7 @@ for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
 	busybox ip link set dev $ifname up
-	busybox wget -T 2 --header="X-Host-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && ip addr flush dev $ifname && break || exit 1
+	busybox wget --header="X-HOST-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && ip addr flush dev $ifname && break || exit 1
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
