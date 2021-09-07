@@ -130,7 +130,7 @@ set -ex
 
 UUID=$(cat /sys/class/dmi/id/product_uuid)
 
-ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
+ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';' | sort)
 for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
@@ -189,7 +189,7 @@ systemd-timesyncd.service
 
 apt update
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 ansible python3-pip
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 $clients || true
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 $(echo $clients | tr '\n' ' ') || true
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org kolla-ansible

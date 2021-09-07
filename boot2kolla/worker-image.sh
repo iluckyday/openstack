@@ -130,7 +130,7 @@ set -ex
 
 UUID=$(cat /sys/class/dmi/id/product_uuid)
 
-ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
+ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';' | sort)
 for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
