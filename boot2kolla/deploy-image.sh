@@ -135,7 +135,7 @@ for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
 	busybox ip link set dev $ifname up
-	busybox wget --header="X-HOST-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && ip addr flush dev $ifname && break || exit 1
+	busybox wget --header="X-HOST-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && break
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
@@ -167,7 +167,7 @@ cat << EOF > ${MNTDIR}/etc/hosts
 127.0.0.1 localhost
 EOF
 
-clients=$(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a}{a=$0}')
+clients="$(apt search --names-only "python3-.*client" | awk '/[oO]pen[sS]tack/ {sub(/\/.*/,"",a);if (a != "") print a " "}{a=$0}')"
 
 chroot ${MNTDIR} /bin/bash -c "
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin PYTHONDONTWRITEBYTECODE=1 DEBIAN_FRONTEND=noninteractive
