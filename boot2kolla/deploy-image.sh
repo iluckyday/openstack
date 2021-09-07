@@ -131,7 +131,7 @@ set -ex
 UUID=$(cat /sys/class/dmi/id/product_uuid)
 
 ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
-for ifname in ifnames
+for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256)) dev $ifname
 	busybox ip link set dev $ifname up

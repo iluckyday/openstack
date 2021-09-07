@@ -4,7 +4,7 @@ set -ex
 timedatectl set-timezone "Asia/Shanghai"
 
 release=$(curl -sSkL https://www.debian.org/releases/ | grep -oP 'codenamed <em>\K(.*)(?=</em>)')
-include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils,isc-dhcp-client"
+include_apps="systemd,systemd-sysv,sudo,bash-completion,openssh-server,busybox,xz-utils"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -131,7 +131,7 @@ set -ex
 UUID=$(cat /sys/class/dmi/id/product_uuid)
 
 ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';')
-for ifname in ifnames
+for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256)) dev $ifname
 	busybox ip link set dev $ifname up
