@@ -135,7 +135,7 @@ for ifname in $ifnames
 do
 	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
 	busybox ip link set dev $ifname up
-	busybox wget --header="X-HOST-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && break
+	busybox wget --header="X-HOST-UUID: $UUID" -qO /tmp/run.sh http://169.254.169.254/run.sh && break || busybox ip addr flush dev $ifname
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
@@ -156,7 +156,7 @@ DEFAULT debian
 LABEL debian
         LINUX /vmlinuz
         INITRD /initrd.img
-        APPEND root=LABEL=debian-root console=ttyS0 quiet
+        APPEND root=LABEL=debian-root console=ttyS0 quiet cgroup_enable=memory swapaccount=1
 EOF
 
 cat << EOF > ${MNTDIR}/etc/hostname
