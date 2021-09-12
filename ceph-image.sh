@@ -165,6 +165,9 @@ cat << EOF > ${MNTDIR}/etc/hosts
 127.0.0.1 localhost
 EOF
 
+curl -sSkL -o /tmp/cephadm https://github.com/ceph/ceph/raw/master/src/cephadm/cephadm
+cp /tmp/cephadm ${MNTDIR}/root/
+
 chroot ${MNTDIR} /bin/bash -c "
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin PYTHONDONTWRITEBYTECODE=1 DEBIAN_FRONTEND=noninteractive
 sed -i 's/root:\*:/root::/' /etc/shadow
