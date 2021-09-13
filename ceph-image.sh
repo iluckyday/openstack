@@ -135,7 +135,7 @@ for (( n=1; n<=5; n++)); do
 		busybox ip link set dev $ifname up
 		busybox wget -qO /tmp/run.sh http://169.254.169.254/$UUID/run.sh && br=y && break || busybox ip addr flush dev $ifname
 	done
-	[ -n $br ] && break || sleep 1
+	[ -z $br ] && sleep 1 || break
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
