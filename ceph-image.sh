@@ -4,7 +4,7 @@ set -ex
 timedatectl set-timezone "Asia/Shanghai"
 
 release=$(curl -sSkL https://www.debian.org/releases/ | grep -oP 'codenamed <em>\K(.*)(?=</em>)')
-include_apps="systemd,systemd-sysv,sudo,openssh-server,busybox,xz-utils"
+include_apps="systemd,systemd-sysv,sudo,openssh-server,busybox,xz-utils,ca-certificates"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-config dump | grep -we Recommends -e Suggests | sed 's/1/0/' | tee /etc/apt/apt.conf.d/99norecommends
@@ -110,40 +110,42 @@ cat << EOF > ${MNTDIR}/etc/initramfs-tools/conf.d/custom
 COMPRESS=xz
 EOF
 
-cat << EOF > ${MNTDIR}/etc/systemd/system/stack-init.service
+cat << EOF > ${MNTDIR}/etc/systemd/system/server-init.service
 [Unit]
 Description=stack init script
 After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/stack-init.sh
-ExecStartPost=/bin/rm -f /etc/systemd/system/stack-init.service /etc/systemd/system/multi-user.target.wants/stack-init.service /usr/sbin/stack-init.sh
+ExecStart=/usr/sbin/server-init.sh
+ExecStartPost=/bin/rm -f /etc/systemd/system/server-init.service /etc/systemd/system/multi-user.target.wants/server-init.service /usr/sbin/server-init.sh
 RemainAfterExit=true
 EOF
 
-cat << "EOF" > ${MNTDIR}/usr/sbin/stack-init.sh
+cat << "EOF" > ${MNTDIR}/usr/sbin/server-init.sh
 #!/bin/bash
 set -ex
 
 UUID=$(cat /sys/class/dmi/id/product_uuid)
 
 ifnames=$(find /sys/class/net -name en* -execdir basename '{}' ';' | sort)
-for ifname in $ifnames
-do
-	busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
-	busybox ip link set dev $ifname up
-	busybox wget --header="X-HOST-UUID: $UUID" --header="Host: boot2ceph" -qO /tmp/run.sh http://169.254.169.254/run.sh && break || busybox ip addr flush dev $ifname
+for (( n=1; n<=5; n++)); do
+	for ifname in $ifnames; do
+		busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
+		busybox ip link set dev $ifname up
+		busybox wget -qO /tmp/run.sh http://169.254.169.254/$UUID/run.sh && br=y && break || busybox ip addr flush dev $ifname
+	done
+	[ -n $br ] && break || sleep 1
 done
 
 [ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
 EOF
-chmod +x ${MNTDIR}/usr/sbin/stack-init.sh
+chmod +x ${MNTDIR}/usr/sbin/server-init.sh
 
 sed -i '/src/d' ${MNTDIR}/etc/apt/sources.list
 ( umask 226 && echo 'Defaults env_keep+="PYTHONDONTWRITEBYTECODE PYTHONHISTFILE"' > ${MNTDIR}/etc/sudoers.d/env_keep )
 
-ln -sf /etc/systemd/system/stack-init.servie ${MNTDIR}/etc/systemd/system/multi-user.target.wants/stack-init.service
+ln -sf /etc/systemd/system/server-init.servie ${MNTDIR}/etc/systemd/system/multi-user.target.wants/server-init.service
 
 mkdir -p ${MNTDIR}/boot/syslinux
 cat << EOF > ${MNTDIR}/boot/syslinux/syslinux.cfg
@@ -185,7 +187,7 @@ e2scrub_reap.service \
 logrotate.service
 
 apt update
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 debianutils python3 lvm2 apparmor
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 debianutils python3 lvm2 apparmor dbus iptables
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
