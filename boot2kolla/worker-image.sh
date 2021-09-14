@@ -135,12 +135,12 @@ for (( n=1; n<=5; n++)); do
 	for ifname in $ifnames; do
 		busybox ip addr add 169.254.$((RANDOM%256)).$((RANDOM%256))/16 dev $ifname
 		busybox ip link set dev $ifname up
-		busybox wget -qO /tmp/run.sh http://169.254.169.254/$UUID/run.sh && br=y && break || busybox ip addr flush dev $ifname
+		source <(busybox wget -qO- http://169.254.169.254/$UUID/run.sh || echo br=n)
+		[ $br = n ] && busybox ip addr flush dev $ifname && continue
+		break
 	done
-	[ -z $br ] && sleep 1 || break
+	[ $br = n ] && sleep 1 || break
 done
-
-[ -r /tmp/run.sh ] && source /tmp/run.sh && rm -f /tmp/run.sh || exit 1
 EOF
 chmod +x ${MNTDIR}/usr/sbin/server-init.sh
 
