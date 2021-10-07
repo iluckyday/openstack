@@ -28,7 +28,7 @@ sleep 1
 docker image list "kolla/${DISTRO}-${TYPE}-*"
 
 DDATE=$(date +%Y%m%d%H%M%S)
-docker save $(docker image list "kolla/${DISTRO}-${TYPE}-*" -q) | xz > /tmp/dockerhub-kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+docker save $(docker image list "kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/dockerhub-kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 
 for (( n=1; n<=3; n++)); do
   ver="$(curl -skL https://api.github.com/repos/Mikubill/transfer/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"

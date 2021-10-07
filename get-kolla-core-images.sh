@@ -35,7 +35,7 @@ for d in ubuntu
 do
 	for t in source binary
 	do
-		docker save $(docker image list "kolla/$d-$t-*" -q) | xz > /tmp/dockerhub-kolla-core-$d-$t-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+		docker save $(docker image list "kolla/$d-$t-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/dockerhub-kolla-core-$d-$t-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 	done
 done
 
