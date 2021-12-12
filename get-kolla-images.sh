@@ -32,7 +32,6 @@ kolla-ansible -i all-in-one pull -vvvv
 sleep 1
 
 docker image list
-docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*"
 
 DDATE=$(date +%Y%m%d%H%M%S)
 docker save $(docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz

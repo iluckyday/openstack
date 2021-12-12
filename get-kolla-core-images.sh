@@ -4,18 +4,17 @@ set -ex
 export XZ_DEFAULTS="-9 -T 0"
 
 apt update
-DEBIAN_FRONTEND=noninteractive apt -y install ansible
+DEBIAN_FRONTEND=noninteractive apt -y install python3-pip python3-dev libffi-dev gcc libssl-dev
 
-pip install kolla-ansible docker
+pip install -U pip
+pip install 'ansible<3.0' kolla-ansible docker
 
 DDATE=$(date +%Y%m%d%H%M%S)
 LATEST_RELEASE=$(curl -sSkL http://www.openstack.com |  grep -oP 'LATEST RELEASE: \K(.*)(?=<)')
 LATEST_RELEASE=${LATEST_RELEASE,,}
 
 cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc
-
-#DISTRO=$(awk -F'"' '/kolla_base_distro/ {print $2}' /etc/kolla/globals.yml)
-#TYPE=$(awk -F'"' '/kolla_install_type/ {print $2}' /etc/kolla/globals.yml)
+cp /usr/local/share/kolla-ansible/ansible/inventory/* .
 
 for d in ubuntu
 do
@@ -27,15 +26,13 @@ do
 	done
 done
 
-docker image list "kolla/*"
-
 sleep 1
 
 for d in ubuntu
 do
 	for t in source binary
 	do
-		docker save $(docker image list "kolla/$d-$t-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/dockerhub-kolla-core-$d-$t-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+		docker save $(docker image list "quay.io/openstack.kolla/$d-$t-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/quay.io-openstack.kolla-core-$d-$t-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 	done
 done
 
@@ -46,7 +43,7 @@ done
 
 curl -skL https://github.com/Mikubill/transfer/releases/download/"$ver"/transfer_"${ver/v/}"_linux_amd64.tar.gz | tar -xz -C /tmp
 
-for f in /tmp/dockerhub-kolla-core-*xz; do
+for f in /tmp/*kolla-core-*xz; do
 FILENAME=$(basename $f)
 SIZE=$(du -h $f | awk '{print $1}')
 trans_url=$(/tmp/transfer wet --silent $f)
