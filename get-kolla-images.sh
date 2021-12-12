@@ -4,7 +4,12 @@ set -ex
 export XZ_DEFAULTS="-9 -T 0"
 
 apt update
-DEBIAN_FRONTEND=noninteractive apt -y install ansible
+#DEBIAN_FRONTEND=noninteractive apt -y install ansible
+DEBIAN_FRONTEND=noninteractive apt -y install python3-pip python3-dev libffi-dev gcc libssl-dev
+
+pip install -U pip
+
+pip install 'ansible<3.0'
 
 pip install kolla-ansible docker
 
