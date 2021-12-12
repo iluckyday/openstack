@@ -31,10 +31,11 @@ kolla-ansible -i all-in-one pull -vvvv
 
 sleep 1
 
-docker image list "kolla/${DISTRO}-${TYPE}-*"
+docker image list
+docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*"
 
 DDATE=$(date +%Y%m%d%H%M%S)
-docker save $(docker image list "kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/dockerhub-kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+docker save $(docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 
 for (( n=1; n<=3; n++)); do
   ver="$(curl -skL https://api.github.com/repos/Mikubill/transfer/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
@@ -43,7 +44,7 @@ done
 
 curl -skL https://github.com/Mikubill/transfer/releases/download/"$ver"/transfer_"${ver/v/}"_linux_amd64.tar.gz | tar -xz -C /tmp
 
-for f in /tmp/dockerhub-kolla-*.tar.xz; do
+for f in /tmp/*kolla-*.tar.xz; do
 FILENAME=$(basename $f)
 SIZE=$(du -h $f | awk '{print $1}')
 trans_url=$(/tmp/transfer wet --silent $f)
