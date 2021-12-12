@@ -27,7 +27,7 @@ cat etc_kolla_globals.yml | sed -e "s/DISTRO/$DISTRO/" -e "s/TYPE/$TYPE/" -e "s/
 #DISTRO=$(awk -F'"' '/kolla_base_distro/ {print $2}' /etc/kolla/globals.yml)
 #TYPE=$(awk -F'"' '/kolla_install_type/ {print $2}' /etc/kolla/globals.yml)
 
-kolla-ansible pull -vvvv
+kolla-ansible -i all-in-one pull -vvvv
 
 sleep 1
 
