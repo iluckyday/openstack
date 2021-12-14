@@ -34,7 +34,18 @@ sleep 1
 docker image list
 
 DDATE=$(date +%Y%m%d%H%M%S)
-docker save $(docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }') | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+imagetags=$(docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }')
+docker save "$imagetags" | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+
+KTMPD=$(mktemp -d)
+for it in "$imagetags"; do
+  docker save -o $KTMPD/"$it".tar "$it"
+done
+
+cd $KTMPD
+tar -Jcf /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-single-images-${LATEST_RELEASE}-${DDATE}.tar.xz *
+
+cd ~
 
 for (( n=1; n<=3; n++)); do
   ver="$(curl -skL https://api.github.com/repos/Mikubill/transfer/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
