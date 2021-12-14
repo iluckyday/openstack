@@ -21,7 +21,7 @@ do
 	for t in source binary
 	do
 		cat etc_kolla_globals.yml | sed -e "s/DISTRO/$d/" -e "s/TYPE/$t/" -e "s/LATEST_RELEASE/${LATEST_RELEASE}/" -e '/openstack_core/,$d' | tee /etc/kolla/globals.yml
-		kolla-ansible pull
+		kolla-ansible -i all-in-one pull
 		sleep 1
 	done
 done

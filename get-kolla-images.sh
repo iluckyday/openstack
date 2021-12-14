@@ -35,10 +35,10 @@ docker image list
 
 DDATE=$(date +%Y%m%d%H%M%S)
 imagetags=$(docker image list "quay.io/openstack.kolla/${DISTRO}-${TYPE}-*" | awk 'NR>1 {print $1 ":" $2 }')
-docker save "$imagetags" | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
+docker save $imagetags | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-images-${LATEST_RELEASE}-${DDATE}.tar.xz
 
 KTMPD=$(mktemp -d)
-for it in "$imagetags"; do
+for it in $imagetags; do
   docker save -o $KTMPD/"$it".tar "$it"
 done
 
