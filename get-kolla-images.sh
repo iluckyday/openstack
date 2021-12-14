@@ -39,7 +39,7 @@ docker save $imagetags | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-ima
 
 KTMPD=$(mktemp -d)
 for it in $imagetags; do
-  docker save -o $KTMPD/"${it##*/}".tar "$it"
+  docker save "$it" | xz > $KTMPD/"${it##*/}".tar.xz
 done
 
 cd $KTMPD
