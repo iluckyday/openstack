@@ -39,13 +39,10 @@ docker save $imagetags | xz > /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-ima
 
 KTMPD=$(mktemp -d)
 for it in $imagetags; do
-  docker save "$it" | xz > $KTMPD/"${it##*/}".tar.xz
+  docker save "$it" | gzip > $KTMPD/"${it##*/}".tar.gz
 done
 
-cd $KTMPD
-tar -Jcf /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-single-images-${LATEST_RELEASE}-${DDATE}.tar.xz *
-
-cd ~
+tar -Jcf /tmp/quay.io-openstack.kolla-${DISTRO}-${TYPE}-single-images-${LATEST_RELEASE}-${DDATE}.tar.xz -C $KTMPD .
 
 for (( n=1; n<=3; n++)); do
   ver="$(curl -skL https://api.github.com/repos/Mikubill/transfer/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')"
