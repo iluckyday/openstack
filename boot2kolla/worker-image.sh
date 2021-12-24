@@ -149,6 +149,7 @@ sed -i '/src/d' ${MNTDIR}/etc/apt/sources.list
 
 ln -sf /etc/systemd/system/server-init.servie ${MNTDIR}/etc/systemd/system/multi-user.target.wants/server-init.service
 
+#default_hugepagesz=1G hugepagesz=1G hugepages=4
 mkdir -p ${MNTDIR}/boot/syslinux
 cat << EOF > ${MNTDIR}/boot/syslinux/syslinux.cfg
 PROMPT 0
@@ -158,7 +159,7 @@ DEFAULT debian
 LABEL debian
         LINUX /vmlinuz
         INITRD /initrd.img
-        APPEND root=LABEL=debian-root console=ttyS0 quiet cgroup_enable=memory swapaccount=1
+        APPEND root=LABEL=debian-root console=ttyS0 quiet cgroup_enable=memory swapaccount=1 intel_iommu=on iommu=pt
 EOF
 
 cat << EOF > ${MNTDIR}/etc/hostname
@@ -186,7 +187,7 @@ e2scrub_reap.service \
 logrotate.service
 
 apt update
-apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 dbus apparmor python3-docker iptables
+apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 dbus apparmor python3-docker iptables crudini
 apt install -y -o APT::Install-Recommends=0 -o APT::Install-Suggests=0 linux-image-cloud-amd64 extlinux initramfs-tools
 dd if=/usr/lib/EXTLINUX/mbr.bin of=$loopx
 extlinux -i /boot/syslinux
