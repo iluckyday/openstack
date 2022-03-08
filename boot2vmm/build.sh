@@ -1,8 +1,10 @@
 #!/bin/sh
 set -ex
 
-apt-get update
-apt-get install -y libelf-dev
+apt update
+apt upgrade -y
+sleep 1
+apt install -y libelf-dev
 
 export KCONFIG_ALLCONFIG=$(pwd)/boot2vmm/build.config
 
