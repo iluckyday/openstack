@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 
 mkdir -p $TARGET_DIR/var/lib/libvirt/qemu $TARGET_DIR/var/lib/libvirt/secrets $TARGET_DIR/var/lib/libvirt/storage
 
