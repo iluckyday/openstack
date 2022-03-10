@@ -5,7 +5,8 @@ mkdir -p $TARGET_DIR/var/lib/libvirt/qemu $TARGET_DIR/var/lib/libvirt/secrets $T
 
 ln -sf /run $TARGET_DIR/var/run
 
-for srv in libvirtd.service libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tcp.socket libvirtd-tls.socket
-do
-	ln -sf /dev/null $TARGET_DIR/etc/systemd/system/$srv
-done
+mkdir -p $TARGET_DIR/etc/systemd/system/virtproxyd.service.d
+cat << EOF > $TARGET_DIR/etc/systemd/system/virtproxyd.service.d/restart.conf
+[Unit]
+StartLimitIntervalSec=0
+EOF
