@@ -5,4 +5,7 @@ mkdir -p $TARGET_DIR/var/lib/libvirt/qemu $TARGET_DIR/var/lib/libvirt/secrets $T
 
 ln -sf /run $TARGET_DIR/var/run
 
-chroot $TARGET_DIR systemctl mask libvirtd.service libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tcp.socket libvirtd-tls.socket
+for srv in libvirtd.service libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tcp.socket libvirtd-tls.socket
+do
+	ln -sf /dev/null $TARGET_DIR/etc/systemd/system/$srv
+done
